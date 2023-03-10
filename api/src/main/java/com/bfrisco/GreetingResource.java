@@ -20,8 +20,12 @@ public class GreetingResource {
 
     @GET
     @Path("/notes")
-    public List<NoteDTO> getNotes() {
-        return dataService.fetchNotes(0, 10);
+    public List<NoteDTO> getNotes(
+            @QueryParam("finalRatingStatus")
+            @DefaultValue("NEEDS_MORE_RATINGS")
+            DataService.FinalRatingStatus status
+    ) {
+        return dataService.fetchNotes(status, 1, 10);
     }
 
     @POST

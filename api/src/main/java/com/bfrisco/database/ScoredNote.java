@@ -49,6 +49,6 @@ public class ScoredNote extends PanacheEntityBase {
     @Column(name = "coverage_rating_status")
     public String coverageRatingStatus;
     @JoinColumn(name = "note_id", insertable = false, updatable = false)
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     public Note note;
 }

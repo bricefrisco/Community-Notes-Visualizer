@@ -65,7 +65,4 @@ public class Note extends PanacheEntityBase {
     public List<NoteStatusHistory> noteStatusHistory;
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "ratingPK.noteId")
     public List<Rating> ratings;
-    @JoinColumn(name = "note_id", insertable = false, updatable = false)
-    @OneToOne(fetch = FetchType.EAGER)
-    public ScoredNote scoredNote;
 }

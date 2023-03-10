@@ -128,10 +128,6 @@ public class DataImporter {
             )
             """;
 
-
-    @Inject
-    EntityManager em;
-
     @Inject
     SessionFactory sessionFactory;
 
@@ -416,13 +412,12 @@ public class DataImporter {
         try (Session session = sessionFactory.openSession()) {
             LOGGER.info("Creating indexes...");
             Transaction transaction = session.beginTransaction();
-            session.createNativeQuery("CREATE INDEX ON notes(created_at DESC)").executeUpdate();
             session.createNativeQuery("CREATE INDEX ON notes(participant_id)").executeUpdate();
             session.createNativeQuery("CREATE INDEX ON note_status_history(note_id)").executeUpdate();
             session.createNativeQuery("CREATE INDEX ON note_status_history(note_id ASC, created_at DESC)").executeUpdate();
             session.createNativeQuery("CREATE INDEX ON ratings(note_id)").executeUpdate();
             session.createNativeQuery("CREATE INDEX ON ratings(participant_id)").executeUpdate();
-            session.createNativeQuery("CREATE INDEX ON scored_notes(note_id)").executeUpdate();
+            session.createNativeQuery("CREATE INDEX ON scored_notes(classification, final_rating_status, created_at DESC)").executeUpdate();
             transaction.commit();
             LOGGER.info("Indexes created.");
         }
