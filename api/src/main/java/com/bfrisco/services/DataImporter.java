@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 
 @ApplicationScoped
@@ -124,7 +124,8 @@ public class DataImporter {
                 expansion_rating_status TEXT,
                 coverage_note_intercept DOUBLE PRECISION,
                 coverage_note_factor_1 DOUBLE PRECISION,
-                coverage_rating_status TEXT
+                coverage_rating_status TEXT,
+                summary_vector TSVECTOR
             )
             """;
 
@@ -143,6 +144,7 @@ public class DataImporter {
         importScoredNotes();
         cleanData();
         createConstraints();
+        createFullTextSearch();
         createIndexes();
 
         LOGGER.info("Data import complete.");
@@ -151,7 +153,7 @@ public class DataImporter {
     private void importUserEnrollment() throws IOException {
         try (Session session = sessionFactory.openSession();
              BufferedReader br = new BufferedReader(new FileReader(
-                     "C:\\Users\\Brice\\Desktop\\community-notes-visualizer\\userEnrollment-00000.tsv"))) {
+                     "C:\\Users\\Brice\\Desktop\\community-notes-visualizer\\data\\userEnrollment-00000.tsv", StandardCharsets.UTF_8))) {
             Transaction transaction = session.beginTransaction();
             int count = 0;
 
@@ -182,7 +184,7 @@ public class DataImporter {
 
     private void importNotes() throws IOException {
         try (Session session = sessionFactory.openSession();
-             BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\Brice\\Desktop\\community-notes-visualizer\\notes-00000.tsv"))) {
+             BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\Brice\\Desktop\\community-notes-visualizer\\data\\notes-00000.tsv", StandardCharsets.UTF_8))) {
             Transaction transaction = session.beginTransaction();
             int count = 0;
 
@@ -231,7 +233,7 @@ public class DataImporter {
 
     private void importNoteStatusHistory() throws IOException {
         try (Session session = sessionFactory.openSession();
-             BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\Brice\\Desktop\\community-notes-visualizer\\noteStatusHistory-00000.tsv"))) {
+             BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\Brice\\Desktop\\community-notes-visualizer\\data\\noteStatusHistory-00000.tsv", StandardCharsets.UTF_8))) {
             Transaction transaction = session.beginTransaction();
             int count = 0;
 
@@ -267,7 +269,7 @@ public class DataImporter {
 
     private void importRatings() throws IOException {
         try (Session session = sessionFactory.openSession();
-             BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\Brice\\Desktop\\community-notes-visualizer\\ratings-00000.tsv"))) {
+             BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\Brice\\Desktop\\community-notes-visualizer\\data\\ratings-00000.tsv", StandardCharsets.UTF_8))) {
             Transaction transaction = session.beginTransaction();
             int count = 0;
 
@@ -324,7 +326,7 @@ public class DataImporter {
 
     private void importScoredNotes() throws IOException {
         try (Session session = sessionFactory.openSession();
-             BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\Brice\\Desktop\\community-notes-visualizer\\scored_notes.tsv"))) {
+             BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\Brice\\Desktop\\community-notes-visualizer\\data\\scored_notes.tsv", StandardCharsets.UTF_8))) {
             Transaction transaction = session.beginTransaction();
 
             int count = 0;
@@ -408,9 +410,24 @@ public class DataImporter {
         }
     }
 
+    private void createFullTextSearch() {
+        try (Session session = sessionFactory.openSession()) {
+            LOGGER.info("Creating full text search field...");
+            Transaction transaction = session.beginTransaction();
+            session.createNativeQuery("""
+                UPDATE scored_notes AS sn
+                SET summary_vector = to_tsvector('english', n.summary)
+                FROM notes AS n
+                WHERE sn.note_id = n.note_id;
+            """).executeUpdate();
+            transaction.commit();
+            LOGGER.info("Full text search field created.");
+        }
+    }
+
     private void createIndexes() {
         try (Session session = sessionFactory.openSession()) {
-            LOGGER.info("Creating indexes...");
+            LOGGER.info("Indexing data...");
             Transaction transaction = session.beginTransaction();
             session.createNativeQuery("CREATE INDEX ON notes(participant_id)").executeUpdate();
             session.createNativeQuery("CREATE INDEX ON note_status_history(note_id)").executeUpdate();
@@ -419,7 +436,7 @@ public class DataImporter {
             session.createNativeQuery("CREATE INDEX ON ratings(participant_id)").executeUpdate();
             session.createNativeQuery("CREATE INDEX ON scored_notes(classification, final_rating_status, created_at DESC)").executeUpdate();
             transaction.commit();
-            LOGGER.info("Indexes created.");
+            LOGGER.info("Data indexed.");
         }
     }
 

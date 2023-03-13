@@ -1,95 +1,87 @@
 import { useEffect, useState } from "react";
 import PageWrapper from "./components/PageWrapper";
-import { TwitterTweetEmbed } from "react-twitter-embed";
 import Note from "./components/Note";
-
-const TabItem = ({ selected, children, onClick }) => {
-  return (
-    <li className="w-full" onClick={onClick}>
-      <span
-        class={`inline-block p-4 border-b-2 border-transparent rounded-t-lg cursor-pointer ${
-          selected
-            ? "text-blue-500 border-blue-500"
-            : "hover:border-gray-300 hover:text-gray-300"
-        }`}
-      >
-        {children}
-      </span>
-    </li>
-  );
-};
-
-const Tabs = ({ values, selected, onChange }) => {
-  return (
-    <div className="text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-700 cursor-pointer">
-      <ul className="flex place-content-between -mb-px">
-        {values.map((value) => (
-          <TabItem
-            key={value.value}
-            selected={value.value === selected}
-            onClick={() => onChange(value.value)}
-          >
-            {value.label}
-          </TabItem>
-        ))}
-      </ul>
-    </div>
-  );
-};
+import Masonry from "react-masonry-css";
+import RadioGroup from "./components/RadioGroup";
+import Tweet from "./components/Tweet";
+import Search from "./components/Search";
+import Pagination from "./components/Pagination";
 
 const App = () => {
-  const [page, setPage] = useState(0);
-  const [notes, setNotes] = useState([]);
-  const [finalRatingStatus, setFinalRatingStatus] =
-    useState("NEEDS_MORE_RATINGS");
-
-  const values = [
-    { value: "NEEDS_MORE_RATINGS", label: "Needs More Ratings" },
-    { value: "CURRENTLY_RATED_HELPFUL", label: "Helpful" },
-    { value: "CURRENTLY_RATED_NOT_HELPFUL", label: "Not Helpful" },
-  ];
+  const [page, setPage] = useState(1);
+  const [data, setData] = useState([]);
+  const [finalRatingStatus, setFinalRatingStatus] = useState("");
 
   useEffect(() => {
     const fetchNotes = async () => {
       const res = await fetch(
-        `http://localhost:8080/notes?finalRatingStatus=${finalRatingStatus}`
+        `http://localhost:8080/notes?finalRatingStatus=${finalRatingStatus}&page=${page}`
       );
-      const data = await res.json();
-      setNotes(data);
 
-      // setNotes((notes) => {
-      //   const ids = notes.map((note) => note.noteId);
-      //   const newNotes = data.filter((note) => !ids.includes(note.noteId));
-      //   return [...notes, ...newNotes];
-      // });
+      const data = await res.json();
+      setData(data);
     };
 
     fetchNotes();
-  }, [finalRatingStatus]);
+  }, [finalRatingStatus, page]);
 
   return (
-    <PageWrapper className="flex flex-col items-center">
-      <h1 className="text-3xl font-bold mt-5 mb-2">
-        Community Notes Visualizer
-      </h1>
+    <PageWrapper className="">
+      <h1 className="text-2xl font-bold mt-5 mb-10">Community Notes Details</h1>
 
-      <div className="w-full max-w-[550px]">
-        <Tabs
-          values={values}
-          selected={finalRatingStatus}
-          onChange={(e) => setFinalRatingStatus(e)}
-        />
-        {notes.map((note) => (
-          <div key={note.noteId} className="mb-5">
-            <TwitterTweetEmbed
-              tweetId={note.tweetId.toString()}
-              placeholder={<div>Loading...</div>}
-              options={{ theme: "dark", conversation: "none", cards: "hidden" }}
-            />
+      <div className="w-full flex">
+        <div className="w-full max-w-[250px]">
+          <div className="font-bold">Filters</div>
 
-            <Note {...note} />
+          <RadioGroup
+            className="mt-5"
+            label="Rating Status"
+            options={[
+              { name: "Any", value: "" },
+              { name: "Helpful", value: "CURRENTLY_RATED_HELPFUL" },
+              { name: "Not Helpful", value: "CURRENTLY_RATED_NOT_HELPFUL" },
+              { name: "Needs More Ratings", value: "NEEDS_MORE_RATINGS" },
+            ]}
+            value={finalRatingStatus}
+            onChange={(e) => setFinalRatingStatus(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <div className="flex items-center place-content-between">
+            <Search className="w-full max-w-xl" />
+
+            {data?.results?.length > 0 && (
+              <Pagination
+                page={page}
+                pageSize={10}
+                totalElements={data.totalResults}
+              />
+            )}
           </div>
-        ))}
+
+          <Masonry
+            className="flex -ml-3 max-w-[1150px]"
+            columnClassName="ml-3"
+            breakpointCols={{ default: 3 }}
+          >
+            {data?.results?.map((note) => (
+              <div key={note.noteId} className="mb-3 max-w-[350px]">
+                <Tweet
+                  tweetId={note.tweetId.toString()}
+                  options={{
+                    theme: "dark",
+                    conversation: "none",
+                    cards: "hidden",
+                    chrome: "noborders",
+                  }}
+                />
+
+                <Note {...note} />
+              </div>
+            ))}
+          </Masonry>
+        </div>
       </div>
     </PageWrapper>
   );

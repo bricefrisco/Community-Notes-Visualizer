@@ -59,8 +59,45 @@ public class NoteDTO {
     @Data
     @RegisterForReflection
     public static class Ratings {
-        private Integer helpful;
-        private Integer somewhatHelpful;
-        private Integer notHelpful;
+        private Helpful helpful = new Helpful();
+        private SomewhatHelpful somewhatHelpful = new SomewhatHelpful();
+        private NotHelpful notHelpful = new NotHelpful();
+    }
+
+    @Data
+    @RegisterForReflection
+    public static class Helpful {
+        private Integer count;
+        private Integer informative;
+        private Integer clear;
+        private Integer empathetic;
+        private Integer goodSources;
+        private Integer uniqueContext;
+        private Integer addressesClaim;
+        private Integer importantContext;
+        private Integer unbiasedLanguage;
+    }
+
+    @Data
+    public static class SomewhatHelpful {
+        private Integer count;
+    }
+
+    @Data
+    @RegisterForReflection
+    public static class NotHelpful {
+        private Integer count;
+        private Integer incorrect;
+        private Integer sourcesMissingOrUnreliable;
+        private Integer opinionSpeculationOrBias;
+        private Integer missingKeyPoints;
+        private Integer outdated;
+        private Integer hardToUnderstand;
+        private Integer argumentativeOrBiased;
+        private Integer offTopic;
+        private Integer spamHarassmentOrAbuse;
+        private Integer irrelevantSources;
+        private Integer opinionSpeculation;
+        private Integer noteNotNeeded;
     }
 }

@@ -1,6 +1,6 @@
 package com.bfrisco;
 
-import com.bfrisco.models.NoteDTO;
+import com.bfrisco.models.NoteResponse;
 import com.bfrisco.services.DataImporter;
 import com.bfrisco.services.DataService;
 
@@ -8,7 +8,6 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
-import java.util.List;
 
 @Path("/")
 public class GreetingResource {
@@ -20,12 +19,24 @@ public class GreetingResource {
 
     @GET
     @Path("/notes")
-    public List<NoteDTO> getNotes(
+    public NoteResponse getNotes(
             @QueryParam("finalRatingStatus")
-            @DefaultValue("NEEDS_MORE_RATINGS")
-            DataService.FinalRatingStatus status
+            String status,
+            @QueryParam("page")
+            @DefaultValue("1")
+            Integer page,
+            @QueryParam("searchQuery")
+            @DefaultValue("")
+            String searchQuery
     ) {
-        return dataService.fetchNotes(status, 1, 10);
+        DataService.FinalRatingStatus finalRatingStatus;
+        try {
+            finalRatingStatus = DataService.FinalRatingStatus.valueOf(status);
+        } catch (IllegalArgumentException e) {
+            finalRatingStatus = null;
+        }
+
+        return dataService.fetchNotes(finalRatingStatus, searchQuery, page - 1, 10);
     }
 
     @POST

@@ -1,21 +1,56 @@
 package com.bfrisco.services;
 
 import com.bfrisco.database.ScoredNote;
-import com.bfrisco.models.NoteDTO;
-import io.quarkus.panache.common.Sort;
+import com.bfrisco.models.NoteResponse;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import java.math.BigInteger;
 import java.util.List;
 
 @ApplicationScoped
 public class DataService {
-    public List<NoteDTO> fetchNotes(FinalRatingStatus status, int page, int pageSize) {
-        List<ScoredNote> notes = ScoredNote.find("classification = 'MISINFORMED_OR_POTENTIALLY_MISLEADING' AND final_rating_status = ?1", Sort.by("createdAt", Sort.Direction.Descending), status.name())
-                .page(page, pageSize)
-                .list();
+    @Inject
+    EntityManager em;
 
-        return DataMapper.toNoteDtos(notes);
+
+    public NoteResponse fetchNotes(FinalRatingStatus status, String searchQuery, int pageNum, int pageSize) {
+        Query countQuery = em.createNativeQuery("""
+            SELECT COUNT(*) FROM scored_notes
+            WHERE classification = 'MISINFORMED_OR_POTENTIALLY_MISLEADING' AND
+            (?1 = '' OR final_rating_status = ?1) AND
+            (?2 = '' OR summary_vector @@ plainto_tsquery('english', ?2))
+        """);
+        countQuery.setParameter(1, status == null ? "" : status.name());
+        countQuery.setParameter(2, searchQuery);
+
+        Query query = em.createNativeQuery("""
+            SELECT * FROM scored_notes
+            WHERE classification = 'MISINFORMED_OR_POTENTIALLY_MISLEADING' AND
+            (?1 = '' OR final_rating_status = ?1) AND
+            (?2 = '' OR summary_vector @@ plainto_tsquery('english', ?2))
+            LIMIT ?3 OFFSET ?4
+        """, ScoredNote.class);
+        query.setParameter(1, status == null ? "" : status.name());
+        query.setParameter(2, searchQuery);
+        query.setParameter(3, pageSize);
+        query.setParameter(4, pageNum * pageSize);
+
+        Long count = ((BigInteger) countQuery.getSingleResult()).longValue();
+        List<ScoredNote> results = query.getResultList();
+
+        NoteResponse response = new NoteResponse();
+        response.setResults(results.stream().map(DataMapper::toNoteDto).toList());
+        response.setPage(pageNum + 1);
+        response.setPageSize(pageSize);
+        response.setTotalResults(count);
+        response.setTotalPages((int) Math.ceil((double) count / pageSize));
+        return response;
     }
+
+
 
     public enum FinalRatingStatus {
         CURRENTLY_RATED_HELPFUL,
