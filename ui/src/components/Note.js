@@ -2,6 +2,7 @@ import he from "he";
 import Linkify from "react-linkify";
 import UserGroup from "../icons/UserGroup";
 import { useMemo } from "react";
+import TwitterButton from "./TwitterButton";
 
 const statuses = {
   NEEDS_MORE_RATINGS: "Needs more ratings",
@@ -68,12 +69,8 @@ const Note = ({ summary, score, ratings }) => {
         </div>
 
         <div className="flex">
-          <div className="mr-1 cursor-pointer hover:bg-twitter-hover-bg rounded-full text-center py-1 px-3 border-twitter-button-border border font-bold text-twitter-link text-twitterButton">
-            All notes
-          </div>
-          <div className="cursor-pointer hover:bg-twitter-hover-bg rounded-full text-center py-1 px-3 border-twitter-button-border border font-bold text-twitter-link text-twitterButton">
-            Note details
-          </div>
+          <TwitterButton className="mr-1">All notes</TwitterButton>
+          <TwitterButton>Note details</TwitterButton>
         </div>
       </div>
     </div>

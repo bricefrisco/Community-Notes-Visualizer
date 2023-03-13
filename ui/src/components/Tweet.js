@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { TwitterTweetEmbed } from "react-twitter-embed";
+import TwitterButton from "./TwitterButton";
 
 const PlaceholderTweet = ({ children }) => {
   return (
@@ -20,13 +21,21 @@ const Tweet = ({ tweetId, options }) => {
     }
   };
 
-  if (error)
+  if (error) {
     return (
       <PlaceholderTweet>
         Error loading tweet. It is possible that the tweet was deleted after
         this note was created.
+        <a
+          href={`https://twitter.com/x/status/${tweetId}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <TwitterButton className="mt-2.5">View on Twitter</TwitterButton>
+        </a>
       </PlaceholderTweet>
     );
+  }
 
   return (
     <TwitterTweetEmbed

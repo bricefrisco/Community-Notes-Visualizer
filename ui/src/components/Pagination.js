@@ -23,22 +23,23 @@ export const PaginationPlaceholder = () => {
   );
 };
 
-const Pagination = ({ page, pageSize, totalElements }) => {
-  // const [searchParams, setSearchParams] = useSearchParams();
+const Pagination = ({ page, pageSize, totalElements, onPageChange }) => {
   const start = (page - 1) * pageSize + 1;
   const end = page * pageSize > totalElements ? totalElements : page * pageSize;
   const hasPrevious = start > 1;
   const hasNext = end < totalElements;
 
-  //   const back = () => {
-  //     searchParams.set("page", (page - 1).toString());
-  //     setSearchParams(searchParams);
-  //   };
+  const back = () => {
+    if (onPageChange) {
+      onPageChange(page - 1);
+    }
+  };
 
-  //   const next = () => {
-  //     searchParams.set("page", (page + 1).toString());
-  //     setSearchParams(searchParams);
-  //   };
+  const next = () => {
+    if (onPageChange) {
+      onPageChange(page + 1);
+    }
+  };
 
   return (
     <div className="mt-3 flex items-center justify-end md:mt-0 md:justify-start">
@@ -56,7 +57,7 @@ const Pagination = ({ page, pageSize, totalElements }) => {
       <div className="xs:mt-0 inline-flex">
         <button
           disabled={!hasPrevious}
-          // onClick={back}
+          onClick={back}
           className="inline-flex cursor-pointer items-center rounded-l border-gray-700 bg-gray-800 px-4 py-2 text-sm font-medium text-gray-400 hover:bg-gray-700 hover:text-white disabled:cursor-not-allowed disabled:hover:bg-gray-800 disabled:hover:text-gray-400"
         >
           <svg
@@ -76,7 +77,7 @@ const Pagination = ({ page, pageSize, totalElements }) => {
         </button>
         <button
           disabled={!hasNext}
-          // onClick={next}
+          onClick={next}
           className="inline-flex cursor-pointer items-center rounded-r border-0 border-l border-gray-700 bg-gray-800 px-4 py-2 text-sm font-medium text-gray-400 hover:bg-gray-700 hover:text-white disabled:cursor-not-allowed disabled:hover:bg-gray-800 disabled:hover:text-gray-400"
         >
           Next

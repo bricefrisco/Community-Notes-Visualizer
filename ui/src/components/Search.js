@@ -1,6 +1,17 @@
-const Search = ({ className }) => {
+import { useState } from "react";
+
+const Search = ({ className, initialValue, onSearch }) => {
+  const [input, setInput] = useState(initialValue || "");
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    if (onSearch) {
+      onSearch(input);
+    }
+  };
+
   return (
-    <form className={className}>
+    <form className={className} onSubmit={onSubmit}>
       <label
         htmlFor="default-search"
         className="mb-2 text-sm font-medium sr-only text-white"
@@ -27,10 +38,10 @@ const Search = ({ className }) => {
         </div>
         <input
           type="search"
-          id="default-search"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
           className="block w-full p-4 pl-10 text-sm border rounded-lg bg-gray-800 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
           placeholder="Search by note text, note id, tweet id..."
-          required
         />
         <button
           type="submit"

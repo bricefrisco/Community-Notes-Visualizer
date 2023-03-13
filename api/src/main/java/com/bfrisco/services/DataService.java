@@ -31,6 +31,7 @@ public class DataService {
             WHERE classification = 'MISINFORMED_OR_POTENTIALLY_MISLEADING' AND
             (?1 = '' OR final_rating_status = ?1) AND
             (?2 = '' OR summary_vector @@ plainto_tsquery('english', ?2))
+            ORDER BY created_at DESC
             LIMIT ?3 OFFSET ?4
         """, ScoredNote.class);
         query.setParameter(1, status == null ? "" : status.name());

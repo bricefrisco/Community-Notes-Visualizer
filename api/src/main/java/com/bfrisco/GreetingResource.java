@@ -36,7 +36,7 @@ public class GreetingResource {
             finalRatingStatus = null;
         }
 
-        return dataService.fetchNotes(finalRatingStatus, searchQuery, page - 1, 10);
+        return dataService.fetchNotes(finalRatingStatus, searchQuery, page - 1, 6);
     }
 
     @POST
