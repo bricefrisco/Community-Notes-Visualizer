@@ -5,7 +5,6 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.List;
 
 @RegisterForReflection
 @Entity
@@ -20,8 +19,4 @@ public class UserEnrollment extends PanacheEntityBase {
     public Integer successfulRatingNeededToEarnIn;
     @Column(name = "timestamp_of_last_state_change")
     public Timestamp timestampOfLastStateChange;
-    @OneToMany(fetch = FetchType.LAZY)
-    public List<Note> notes;
-    @OneToMany(fetch = FetchType.LAZY)
-    public List<Rating> ratings;
 }

@@ -1,6 +1,6 @@
 package com.bfrisco.services;
 
-import com.bfrisco.database.ScoredNote;
+import com.bfrisco.database.Note;
 import com.bfrisco.models.NoteResponse;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -18,7 +18,7 @@ public class DataService {
 
     public NoteResponse fetchNotes(FinalRatingStatus status, String searchQuery, int pageNum, int pageSize) {
         Query countQuery = em.createNativeQuery("""
-            SELECT COUNT(*) FROM scored_notes
+            SELECT COUNT(*) FROM notes
             WHERE classification = 'MISINFORMED_OR_POTENTIALLY_MISLEADING' AND
             (?1 = '' OR final_rating_status = ?1) AND
             (?2 = '' OR summary_vector @@ plainto_tsquery('english', ?2))
@@ -27,20 +27,20 @@ public class DataService {
         countQuery.setParameter(2, searchQuery);
 
         Query query = em.createNativeQuery("""
-            SELECT * FROM scored_notes
+            SELECT * FROM notes
             WHERE classification = 'MISINFORMED_OR_POTENTIALLY_MISLEADING' AND
             (?1 = '' OR final_rating_status = ?1) AND
             (?2 = '' OR summary_vector @@ plainto_tsquery('english', ?2))
             ORDER BY created_at DESC
             LIMIT ?3 OFFSET ?4
-        """, ScoredNote.class);
+        """, Note.class);
         query.setParameter(1, status == null ? "" : status.name());
         query.setParameter(2, searchQuery);
         query.setParameter(3, pageSize);
         query.setParameter(4, pageNum * pageSize);
 
         Long count = ((BigInteger) countQuery.getSingleResult()).longValue();
-        List<ScoredNote> results = query.getResultList();
+        List<Note> results = query.getResultList();
 
         NoteResponse response = new NoteResponse();
         response.setResults(results.stream().map(DataMapper::toNoteDto).toList());

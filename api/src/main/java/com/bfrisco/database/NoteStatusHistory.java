@@ -15,9 +15,6 @@ public class NoteStatusHistory extends PanacheEntityBase {
     public Long id;
     @Column(name = "note_id")
     public String noteId;
-    @JoinColumn(name = "note_id", insertable = false, updatable = false)
-    @ManyToOne(fetch = FetchType.LAZY)
-    public Note note;
     @Column(name = "created_at")
     public Timestamp createdAt;
     @Column(name = "timestamp_first_non_nmr_status")

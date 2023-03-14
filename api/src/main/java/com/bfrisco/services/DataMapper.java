@@ -2,19 +2,16 @@ package com.bfrisco.services;
 
 import com.bfrisco.database.Note;
 import com.bfrisco.database.Rating;
-import com.bfrisco.database.ScoredNote;
 import com.bfrisco.models.NoteDTO;
 
 import java.util.List;
 
 public final class DataMapper {
-    public static List<NoteDTO> toNoteDtos(List<ScoredNote> notes) {
+    public static List<NoteDTO> toNoteDtos(List<Note> notes) {
         return notes.stream().map(DataMapper::toNoteDto).toList();
     }
 
-    public static NoteDTO toNoteDto(ScoredNote scoredNote) {
-        Note note = scoredNote.note;
-
+    public static NoteDTO toNoteDto(Note note) {
         NoteDTO dto = new NoteDTO();
         dto.setNoteId(note.noteId);
         dto.setParticipantId(note.participantId);
@@ -40,24 +37,24 @@ public final class DataMapper {
         dto.setSummary(note.summary);
 
         NoteDTO.Score score = new NoteDTO.Score();
-        score.setCoreNoteIntercept(scoredNote.coreNoteIntercept);
-        score.setCoreNoteSlope(scoredNote.coreNoteFactor);
-        score.setFinalRatingStatus(scoredNote.finalRatingStatus);
-        score.setFirstTag(scoredNote.firstTag);
-        score.setSecondTag(scoredNote.secondTag);
-        score.setCoreActiveRules(scoredNote.coreActiveRules);
-        score.setActiveFilterTags(scoredNote.activeFilterTags);
-        score.setClassification(scoredNote.classification);
-        score.setCreatedAt(scoredNote.createdAt);
-        score.setCoreRatingStatus(scoredNote.coreRatingStatus);
-        score.setMetaScorerActiveRules(scoredNote.metaScorerActiveRules);
-        score.setDecidedBy(scoredNote.decidedBy);
-        score.setExpansionNoteIntercept(scoredNote.expansionNoteIntercept);
-        score.setExpansionNoteFactor1(scoredNote.expansionNoteFactor1);
-        score.setExpansionRatingStatus(scoredNote.expansionRatingStatus);
-        score.setCoverageNoteIntercept(scoredNote.coverageNoteIntercept);
-        score.setCoverageNoteFactor1(scoredNote.coverageNoteFactor1);
-        score.setCoverageRatingStatus(scoredNote.coverageRatingStatus);
+        score.setCoreNoteIntercept(note.coreNoteIntercept);
+        score.setCoreNoteSlope(note.coreNoteFactor);
+        score.setFinalRatingStatus(note.finalRatingStatus);
+        score.setFirstTag(note.firstTag);
+        score.setSecondTag(note.secondTag);
+        score.setCoreActiveRules(note.coreActiveRules);
+        score.setActiveFilterTags(note.activeFilterTags);
+        score.setClassification(note.classification);
+        score.setCreatedAt(note.createdAt);
+        score.setCoreRatingStatus(note.coreRatingStatus);
+        score.setMetaScorerActiveRules(note.metaScorerActiveRules);
+        score.setDecidedBy(note.decidedBy);
+        score.setExpansionNoteIntercept(note.expansionNoteIntercept);
+        score.setExpansionNoteFactor1(note.expansionNoteFactor1);
+        score.setExpansionRatingStatus(note.expansionRatingStatus);
+        score.setCoverageNoteIntercept(note.coverageNoteIntercept);
+        score.setCoverageNoteFactor1(note.coverageNoteFactor1);
+        score.setCoverageRatingStatus(note.coverageRatingStatus);
         dto.setScore(score);
 
         int helpful = 0;

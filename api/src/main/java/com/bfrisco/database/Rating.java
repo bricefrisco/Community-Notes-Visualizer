@@ -72,10 +72,4 @@ public class Rating extends PanacheEntityBase {
     public Boolean notHelpfulOpinionSpeculation;
     @Column(name = "not_helpful_note_not_needed")
     public Boolean notHelpfulNoteNotNeeded;
-    @JoinColumn(name = "note_id", insertable = false, updatable = false)
-    @ManyToOne(fetch = FetchType.LAZY)
-    public Note note;
-    @JoinColumn(name = "participant_id", insertable = false, updatable = false)
-    @ManyToOne(fetch = FetchType.LAZY)
-    public UserEnrollment createdBy;
 }
