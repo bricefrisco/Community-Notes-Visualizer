@@ -7,6 +7,7 @@ import RadioGroup from "../components/RadioGroup";
 import Tweet from "../components/Tweet";
 import Search from "../components/Search";
 import Pagination from "../components/Pagination";
+import { Breadcrumb, Breadcrumbs } from "../components/Breadcrumbs";
 
 const Notes = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -49,6 +50,13 @@ const Notes = () => {
   return (
     <PageWrapper className="">
       <h1 className="text-2xl font-bold mt-5 mb-10">Community Notes Details</h1>
+
+      <Breadcrumbs className="mb-5">
+        <Breadcrumb to="/">Home</Breadcrumb>
+        <Breadcrumb to="/notes" hasPrevious>
+          Notes
+        </Breadcrumb>
+      </Breadcrumbs>
 
       <div className="w-full flex">
         <div className="w-full max-w-[250px]">

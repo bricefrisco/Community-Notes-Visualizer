@@ -3,11 +3,21 @@ import Linkify from "react-linkify";
 import UserGroup from "../icons/UserGroup";
 import { useMemo } from "react";
 import TwitterButton from "./TwitterButton";
+import Circle from "../icons/Circle";
 
 const statuses = {
-  NEEDS_MORE_RATINGS: "Needs more ratings",
-  CURRENTLY_RATED_HELPFUL: "Currently rated helpful",
-  CURRENTLY_RATED_NOT_HELPFUL: "Currently rated not helpful",
+  NEEDS_MORE_RATINGS: {
+    text: "Needs more ratings",
+    className: "text-gray-400",
+  },
+  CURRENTLY_RATED_HELPFUL: {
+    text: "Currently rated helpful",
+    className: "text-green-400",
+  },
+  CURRENTLY_RATED_NOT_HELPFUL: {
+    text: "Currently rated not helpful",
+    className: "text-red-400",
+  },
 };
 
 const DecoratedHref = (href, text, key) => {
@@ -45,11 +55,15 @@ const Note = ({ summary, score, ratings }) => {
           <UserGroup className="w-5 h-5 text-blue-500 mr-1.5" />
           Community Note
         </div>
-        <div className="font-semibold mb-1">
-          {" "}
-          {statuses[score.coreRatingStatus]}
+        <div className="font-semibold mb-1 flex items-center">
+          <Circle
+            className={`w-2 h-2 mr-1 ${
+              statuses[score.coreRatingStatus].className
+            }`}
+          />
+          {statuses[score.coreRatingStatus].text}
         </div>
-        <div className="capitalize text-gray-400">{ratingReasons}</div>
+        <div className="capitalize text-gray-400 mb-1">{ratingReasons}</div>
         <span className="leading-6 whitespace-pre-line">
           <Linkify componentDecorator={DecoratedHref}>
             {he.decode(summary.replace("    ", "\n"))}
